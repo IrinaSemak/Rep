@@ -17,6 +17,21 @@ class Sneakers {
     }
 
     // Getter methods
+    public String getName() {
+        return name;
+    }
+
+    public double getCost() {
+        return cost;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public Producer getProducer() {
+        return producer;
+    }
 
     private static class Producer {
         private String name;
@@ -27,22 +42,60 @@ class Sneakers {
             this.country = country;
         }
 
-    }
-    public static void main(String[] args) {
-        List<Sneakers> sneakersList = new ArrayList<>();
+        public String getName() {
+            return name;
+        }
 
-        sneakersList.add(new Sneakers("Nike Air Max", 150.0, "Running", new Producer("Nike", "USA")));
-        sneakersList.add(new Sneakers("Adidas Superstar", 100.0, "Casual", new Producer("Adidas", "Germany")));
-        sneakersList.add(new Sneakers("Nike Mercurial", 150.0, "Running", new Producer("Nike", "США")));
-        sneakersList.add(new Sneakers("Adidas Predator", 140.0, "Casual", new Producer("Adidas", "Германия")));
-        sneakersList.add(new Sneakers("Nike Air Jordan", 200.0, "Running", new Producer("Nike", "США")));
-        sneakersList.add(new Sneakers("Adidas Harden", 180.0,"Casual", new Producer("Adidas", "Германия")));
-        sneakersList.add(new Sneakers("Puma Suede", 80.0, "Casual", new Producer ("Puma", "Германия")));
-        sneakersList.add(new Sneakers("Reebok Classic", 70.0, "Casual",new Producer ( "Reebok", "США")));
-        sneakersList.add(new Sneakers("Converse Chuck Taylor", 60.0, "Casual", new Producer ("Converse", "США")));
-        sneakersList.add(new Sneakers("New Balance 574", 90.0, "Running", new Producer ("New Balance", "США")));
-        sneakersList.add(new Sneakers("Asics Gel-Nimbus", 120.0, "Running", new Producer ( "Asics", "Япония")));
-        sneakersList.add(new Sneakers("Brooks Ghost", 110.0, "Running", new Producer ( "Brooks", "США")));
+        public String getCountry() {
+            return country;
+        }
+    }
+
+    // Класс репозиторий для управления коллекцией объектов Sneakers
+    public static class Repository<T extends Sneakers> {
+        private List<T> items;
+
+        public Repository() {
+            items = new ArrayList<>();
+        }
+
+        public void add(T item) {
+            items.add(item);
+        }
+
+        public void remove(T item) {
+            items.remove(item);
+        }
+
+        public void update(int index, T item) {
+            if (index >= 0 && index < items.size()) {
+                items.set(index, item);
+            }
+        }
+
+        public List<T> getAll() {
+            return items;
+        }
+    }
+
+    public static void main(String[] args) {
+        Repository<Sneakers> sneakersRepository = new Repository<>();
+
+        // Создание и добавление объектов Sneakers в репозиторий
+        sneakersRepository.add(new Sneakers("Nike Air Max", 150.0, "Running", new Producer("Nike", "USA")));
+        sneakersRepository.add(new Sneakers("Adidas Superstar", 100.0, "Casual", new Producer("Adidas", "Germany")));
+        sneakersRepository.add(new Sneakers("Nike Mercurial", 150.0, "Running", new Producer("Nike", "США")));
+        sneakersRepository.add(new Sneakers("Adidas Predator", 140.0, "Casual", new Producer("Adidas", "Германия")));
+        sneakersRepository.add(new Sneakers("Nike Air Jordan", 200.0, "Running", new Producer("Nike", "США")));
+        sneakersRepository.add(new Sneakers("Adidas Harden", 180.0, "Casual", new Producer("Adidas", "Германия")));
+        sneakersRepository.add(new Sneakers("Puma Suede", 80.0, "Casual", new Producer("Puma", "Германия")));
+        sneakersRepository.add(new Sneakers("Reebok Classic", 70.0, "Casual", new Producer("Reebok", "США")));
+        sneakersRepository.add(new Sneakers("Converse Chuck Taylor", 60.0, "Casual", new Producer("Converse", "США")));
+        sneakersRepository.add(new Sneakers("New Balance 574", 90.0, "Running", new Producer("New Balance", "США")));
+        sneakersRepository.add(new Sneakers("Asics Gel-Nimbus", 120.0, "Running", new Producer("Asics", "Япония")));
+        sneakersRepository.add(new Sneakers("Brooks Ghost", 110.0, "Running", new Producer("Brooks", "США")));
+
+        List<Sneakers> sneakersList = sneakersRepository.getAll();
 
         // количество производителей
         int numProducers = countProducers(sneakersList);
@@ -59,8 +112,6 @@ class Sneakers {
         for (Map.Entry<String, Double> entry : avgCostByType.entrySet()) {
             System.out.println("Средняя стоимость для типа " + entry.getKey() + ": " + entry.getValue());
         }
-
-
     }
 
     private static int countProducers(List<Sneakers> sneakersList) {
