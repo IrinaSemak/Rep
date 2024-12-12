@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="35ce2e51-930e-4c9d-8247-676cfd22c66c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Repository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Producer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Sneakers.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
     </list>
@@ -78,7 +79,7 @@
       <workItem from="1729143372672" duration="218000" />
       <workItem from="1732778897115" duration="57000" />
       <workItem from="1733383119053" duration="236000" />
-      <workItem from="1733987465705" duration="679000" />
+      <workItem from="1733987465705" duration="1590000" />
     </task>
     <servers />
   </component>
