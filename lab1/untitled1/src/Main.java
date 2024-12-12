@@ -51,33 +51,6 @@ class Sneakers {
         }
     }
 
-    // Класс репозиторий для управления коллекцией объектов Sneakers
-    public static class Repository<T extends Sneakers> {
-        private List<T> items;
-
-        public Repository() {
-            items = new ArrayList<>();
-        }
-
-        public void add(T item) {
-            items.add(item);
-        }
-
-        public void remove(T item) {
-            items.remove(item);
-        }
-
-        public void update(int index, T item) {
-            if (index >= 0 && index < items.size()) {
-                items.set(index, item);
-            }
-        }
-
-        public List<T> getAll() {
-            return items;
-        }
-    }
-
     public static void main(String[] args) {
         Repository<Sneakers> sneakersRepository = new Repository<>();
 
