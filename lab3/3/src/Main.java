@@ -1,52 +1,127 @@
-import java.util.ArrayList;
+import javax.swing.*;
+import java.awt.*;
 import java.util.List;
 
-public class RadixSort {
-    public static void radixSort(int[] arr) {
-        int max = getMax(arr);
-        for (int exp = 1; max / exp > 0; exp *= 10) {
-            countSort(arr, exp);
-        }
-    }
+public class Main {
+    private RadixSort radixSort = new RadixSort();
+    private JTextArea displayArea;
 
-    private static int getMax(int[] arr) {
-        int max = arr[0];
-        for (int i = 1; i < arr.length; i++) {
-            if (arr[i] > max) {
-                max = arr[i];
+    public Main() {
+        JFrame frame = new JFrame("Radix Sort Management App");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(600, 400);
+
+        displayArea = new JTextArea();
+        displayArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(displayArea);
+
+        JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new GridLayout(3, 2));
+
+        JTextField arrayField = new JTextField();
+
+        inputPanel.add(new JLabel("Массив (через запятую):"));
+        inputPanel.add(arrayField);
+
+        JPanel buttonPanel = new JPanel();
+        JButton addButton = new JButton("Добавить");
+        JButton removeButton = new JButton("Удалить");
+        JButton updateButton = new JButton("Обновить");
+        JButton sortButton = new JButton("Отсортировать");
+        JButton showAllButton = new JButton("Показать все");
+
+        buttonPanel.add(addButton);
+        buttonPanel.add(removeButton);
+        buttonPanel.add(updateButton);
+        buttonPanel.add(sortButton);
+        buttonPanel.add(showAllButton);
+
+        addButton.addActionListener(e -> {
+            String arrayStr = arrayField.getText().trim();
+            if (arrayStr.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "Пожалуйста, введите массив!");
+                return;
             }
-        }
-        return max;
+
+            try {
+                String[] arrayParts = arrayStr.split(",");
+                int[] array = new int[arrayParts.length];
+                for (int i = 0; i < arrayParts.length; i++) {
+                    array[i] = Integer.parseInt(arrayParts[i].trim());
+                }
+
+                radixSort.addArray(array);
+                updateDisplay();
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(frame, "Неверный ввод числовых значений!");
+            }
+        });
+
+        removeButton.addActionListener(e -> {
+            String indexStr = JOptionPane.showInputDialog(frame, "Введите индекс массива для удаления:");
+            if (indexStr != null) {
+                try {
+                    int index = Integer.parseInt(indexStr.trim()) - 1;
+                    radixSort.removeArrayByIndex(index);
+                    updateDisplay();
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(frame, "Неверный индекс!");
+                }
+            }
+        });
+
+        updateButton.addActionListener(e -> {
+            String indexStr = JOptionPane.showInputDialog(frame, "Введите индекс массива для обновления:");
+            if (indexStr != null) {
+                try {
+                    int index = Integer.parseInt(indexStr.trim()) - 1;
+                    String arrayStr = JOptionPane.showInputDialog(frame, "Введите новый массив (через запятую):");
+                    if (arrayStr != null) {
+                        String[] arrayParts = arrayStr.split(",");
+                        int[] array = new int[arrayParts.length];
+                        for (int i = 0; i < arrayParts.length; i++) {
+                            array[i] = Integer.parseInt(arrayParts[i].trim());
+                        }
+                        radixSort.updateArray(index, array);
+                        updateDisplay();
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(frame, "Неверный индекс или массив!");
+                }
+            }
+        });
+
+        sortButton.addActionListener(e -> {
+            for (int[] arr : radixSort.getAllArrays()) {
+                RadixSort.radixSort(arr);
+            }
+            updateDisplay();
+        });
+
+        showAllButton.addActionListener(e -> updateDisplay());
+
+        frame.setLayout(new BorderLayout());
+        frame.add(scrollPane, BorderLayout.CENTER);
+        frame.add(inputPanel, BorderLayout.NORTH);
+        frame.add(buttonPanel, BorderLayout.SOUTH);
+
+        frame.setVisible(true);
     }
 
-    private static void countSort(int[] arr, int exp) {
-        int n = arr.length;
-        int[] output = new int[n];
-        int[] count = new int[10];
-
-        for (int i = 0; i < n; i++) {
-            count[(arr[i] / exp) % 10]++;
+    private void updateDisplay() {
+        List<int[]> arrays = radixSort.getAllArrays();
+        StringBuilder sb = new StringBuilder("Массивы:\n");
+        for (int i = 0; i < arrays.size(); i++) {
+            sb.append(i + 1).append(". ");
+            for (int num : arrays.get(i)) {
+                sb.append(num).append(" ");
+            }
+            sb.append("\n");
         }
-
-        for (int i = 1; i < 10; i++) {
-            count[i] += count[i - 1];
-        }
-
-        for (int i = n - 1; i >= 0; i--) {
-            output[count[(arr[i] / exp) % 10] - 1] = arr[i];
-            count[(arr[i] / exp) % 10]--;
-        }
-
-        for (int i = 0; i < n; i++) {
-            arr[i] = output[i];
-        }
+        displayArea.setText(sb.toString());
     }
 
     public static void main(String[] args) {
-        int[] arr = {170, 45, 75, 90, 802, 24, 2, 66};
-        radixSort(arr);
-        for (int i : arr) {
-            System.out.print(i + " ");
-        }
+        SwingUtilities.invokeLater(Main::new);
     }
 }
