@@ -14,5 +14,9 @@ public class Producer {
     public String getCountry() {
         return country;
     }
-}
 
+    @Override
+    public String toString() {
+        return name + " (" + country + ")";
+    }
+}
