@@ -1,40 +1,109 @@
+import javax.swing.*;
+import java.awt.*;
 import java.util.List;
-import java.util.Map;
 
 public class Main {
+    private Repository<Sneakers> repository = new Repository<>();
+    private JTextArea displayArea;
+
+    public Main() {
+        JFrame frame = new JFrame("Sneakers Management App");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(600, 400);
+
+        displayArea = new JTextArea();
+        displayArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(displayArea);
+
+        JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new GridLayout(7, 2));
+
+        JTextField modelField = new JTextField();
+        JTextField priceField = new JTextField();
+        JTextField typeField = new JTextField();
+        JTextField producerField = new JTextField();
+        JTextField countryField = new JTextField();
+
+        inputPanel.add(new JLabel("Модель:"));
+        inputPanel.add(modelField);
+        inputPanel.add(new JLabel("Цена:"));
+        inputPanel.add(priceField);
+        inputPanel.add(new JLabel("Тип:"));
+        inputPanel.add(typeField);
+        inputPanel.add(new JLabel("Производитель:"));
+        inputPanel.add(producerField);
+        inputPanel.add(new JLabel("Страна:"));
+        inputPanel.add(countryField);
+
+        JPanel buttonPanel = new JPanel();
+        JButton addButton = new JButton("Добавить");
+        JButton removeButton = new JButton("Удалить");
+        JButton showAllButton = new JButton("Показать все");
+
+        buttonPanel.add(addButton);
+        buttonPanel.add(removeButton);
+        buttonPanel.add(showAllButton);
+
+        addButton.addActionListener(e -> {
+            String model = modelField.getText().trim();
+            String priceStr = priceField.getText().trim();
+            String type = typeField.getText().trim();
+            String producerName = producerField.getText().trim();
+            String country = countryField.getText().trim();
+
+            if (model.isEmpty() || priceStr.isEmpty() || type.isEmpty() || producerName.isEmpty() || country.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "Пожалуйста, заполните все поля!");
+                return;
+            }
+
+            try {
+                double price = Double.parseDouble(priceStr);
+                Producer producer = new Producer(producerName, country);
+                repository.add(new Sneakers(model, price, type, producer));
+                updateDisplay();
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(frame, "Неверный ввод числовых значений!");
+            }
+        });
+
+        removeButton.addActionListener(e -> {
+            String indexStr = JOptionPane.showInputDialog(frame, "Введите индекс модели для удаления:");
+            if (indexStr != null) {
+                try {
+                    int index = Integer.parseInt(indexStr.trim()) - 1;
+                    List<Sneakers> sneakersList = repository.getAll();
+                    if (index >= 0 && index < sneakersList.size()) {
+                        repository.remove(sneakersList.get(index));
+                        updateDisplay();
+                    } else {
+                        JOptionPane.showMessageDialog(frame, "Неверный индекс!");
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(frame, "Неверный индекс!");
+                }
+            }
+        });
+
+        showAllButton.addActionListener(e -> updateDisplay());
+
+        frame.setLayout(new BorderLayout());
+        frame.add(scrollPane, BorderLayout.CENTER);
+        frame.add(inputPanel, BorderLayout.NORTH);
+        frame.add(buttonPanel, BorderLayout.SOUTH);
+
+        frame.setVisible(true);
+    }
+
+    private void updateDisplay() {
+        List<Sneakers> sneakersList = repository.getAll();
+        StringBuilder sb = new StringBuilder("Список кроссовок:\n");
+        for (int i = 0; i < sneakersList.size(); i++) {
+            sb.append(i + 1).append(". ").append(sneakersList.get(i)).append("\n");
+        }
+        displayArea.setText(sb.toString());
+    }
+
     public static void main(String[] args) {
-        Repository<Sneakers> sneakersRepository = new Repository<>();
-
-        // Создание и добавление объектов Sneakers в репозиторий
-        sneakersRepository.add(new Sneakers("Nike Air Max", 150.0, "Running", new Producer("Nike", "USA")));
-        sneakersRepository.add(new Sneakers("Adidas Superstar", 100.0, "Casual", new Producer("Adidas", "Germany")));
-        sneakersRepository.add(new Sneakers("Nike Mercurial", 150.0, "Running", new Producer("Nike", "США")));
-        sneakersRepository.add(new Sneakers("Adidas Predator", 140.0, "Casual", new Producer("Adidas", "Германия")));
-        sneakersRepository.add(new Sneakers("Nike Air Jordan", 200.0, "Running", new Producer("Nike", "США")));
-        sneakersRepository.add(new Sneakers("Adidas Harden", 180.0, "Casual", new Producer("Adidas", "Германия")));
-        sneakersRepository.add(new Sneakers("Puma Suede", 80.0, "Casual", new Producer("Puma", "Германия")));
-        sneakersRepository.add(new Sneakers("Reebok Classic", 70.0, "Casual", new Producer("Reebok", "США")));
-        sneakersRepository.add(new Sneakers("Converse Chuck Taylor", 60.0, "Casual", new Producer("Converse", "США")));
-        sneakersRepository.add(new Sneakers("New Balance 574", 90.0, "Running", new Producer("New Balance", "США")));
-        sneakersRepository.add(new Sneakers("Asics Gel-Nimbus", 120.0, "Running", new Producer("Asics", "Япония")));
-        sneakersRepository.add(new Sneakers("Brooks Ghost", 110.0, "Running", new Producer("Brooks", "США")));
-
-        List<Sneakers> sneakersList = sneakersRepository.getAll();
-
-        // Количество производителей
-        int numProducers = Sneakers.countProducers(sneakersList);
-        System.out.println("Количество производителей: " + numProducers);
-
-        // Средняя стоимость кроссовок для каждого производителя
-        Map<String, Double> avgCostByProducer = Sneakers.calculateAvgCostByProducer(sneakersList);
-        for (Map.Entry<String, Double> entry : avgCostByProducer.entrySet()) {
-            System.out.println("Средняя стоимость для производителя " + entry.getKey() + ": " + entry.getValue());
-        }
-
-        // Рассчитайте среднюю стоимость кроссовок для каждого типа
-        Map<String, Double> avgCostByType = Sneakers.calculateAvgCostByType(sneakersList);
-        for (Map.Entry<String, Double> entry : avgCostByType.entrySet()) {
-            System.out.println("Средняя стоимость для типа " + entry.getKey() + ": " + entry.getValue());
-        }
+        SwingUtilities.invokeLater(Main::new);
     }
 }

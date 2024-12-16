@@ -1,28 +1,26 @@
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Sneakers {
-    private String name;
-    private double cost;
+    private String model;
+    private double price;
     private String type;
     private Producer producer;
 
-    public Sneakers(String name, double cost, String type, Producer producer) {
-        this.name = name;
-        this.cost = cost;
+    public Sneakers(String model, double price, String type, Producer producer) {
+        this.model = model;
+        this.price = price;
         this.type = type;
         this.producer = producer;
     }
 
-    // Getter methods
-    public String getName() {
-        return name;
+    public String getModel() {
+        return model;
     }
 
-    public double getCost() {
-        return cost;
+    public double getPrice() {
+        return price;
     }
 
     public String getType() {
@@ -33,54 +31,31 @@ public class Sneakers {
         return producer;
     }
 
-    // Static utility methods
+    @Override
+    public String toString() {
+        return "Модель: " + model + ", Цена: " + price + ", Тип: " + type + ", Производитель: " + producer;
+    }
+
     public static int countProducers(List<Sneakers> sneakersList) {
-        List<String> producers = new ArrayList<>();
-        for (Sneakers sneakers : sneakersList) {
-            if (!producers.contains(sneakers.getProducer().getName())) {
-                producers.add(sneakers.getProducer().getName());
-            }
-        }
-        return producers.size();
+        return (int) sneakersList.stream()
+                .map(s -> s.getProducer().getName())
+                .distinct()
+                .count();
     }
 
     public static Map<String, Double> calculateAvgCostByProducer(List<Sneakers> sneakersList) {
-        Map<String, List<Double>> producerCosts = new HashMap<>();
-        for (Sneakers sneakers : sneakersList) {
-            if (!producerCosts.containsKey(sneakers.getProducer().getName())) {
-                producerCosts.put(sneakers.getProducer().getName(), new ArrayList<>());
-            }
-            producerCosts.get(sneakers.getProducer().getName()).add(sneakers.getCost());
-        }
-
-        Map<String, Double> avgCostByProducer = new HashMap<>();
-        for (Map.Entry<String, List<Double>> entry : producerCosts.entrySet()) {
-            double sum = 0;
-            for (Double cost : entry.getValue()) {
-                sum += cost;
-            }
-            avgCostByProducer.put(entry.getKey(), sum / entry.getValue().size());
-        }
-        return avgCostByProducer;
+        return sneakersList.stream()
+                .collect(Collectors.groupingBy(
+                        s -> s.getProducer().getName(),
+                        Collectors.averagingDouble(Sneakers::getPrice)
+                ));
     }
 
     public static Map<String, Double> calculateAvgCostByType(List<Sneakers> sneakersList) {
-        Map<String, List<Double>> typeCosts = new HashMap<>();
-        for (Sneakers sneakers : sneakersList) {
-            if (!typeCosts.containsKey(sneakers.getType())) {
-                typeCosts.put(sneakers.getType(), new ArrayList<>());
-            }
-            typeCosts.get(sneakers.getType()).add(sneakers.getCost());
-        }
-
-        Map<String, Double> avgCostByType = new HashMap<>();
-        for (Map.Entry<String, List<Double>> entry : typeCosts.entrySet()) {
-            double sum = 0;
-            for (Double cost : entry.getValue()) {
-                sum += cost;
-            }
-            avgCostByType.put(entry.getKey(), sum / entry.getValue().size());
-        }
-        return avgCostByType;
+        return sneakersList.stream()
+                .collect(Collectors.groupingBy(
+                        Sneakers::getType,
+                        Collectors.averagingDouble(Sneakers::getPrice)
+                ));
     }
 }
